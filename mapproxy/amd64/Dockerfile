@@ -16,15 +16,17 @@ RUN pip install \
   Shapely \
   lxml \
   six \
-  MapProxy
+  MapProxy \
+  uwsgi
 RUN apt-get install -y curl
 
 RUN useradd -m mapproxy
-USER mapproxy
+
 WORKDIR /home/mapproxy
+COPY cmd.sh ./cmd.sh
+RUN chmod -R 777 ./cmd.sh
+RUN chown mapproxy:mapproxy ./cmd.sh
 
-RUN mapproxy-util create -t base-config ./
-
+USER mapproxy
 EXPOSE 8080/tcp
-CMD ["mapproxy-util", "serve-develop", "--bind=0.0.0.0:8080", "mapproxy.yaml"]
-
+ENTRYPOINT ["./cmd.sh"]
